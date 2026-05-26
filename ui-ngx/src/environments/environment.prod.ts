@@ -15,7 +15,7 @@
 ///
 
 export const environment = {
-  appTitle: 'ThingsBoard',
+  appTitle: 'Hệ thống giám sát nhà máy và mạng lưới cấp nước',
   production: true,
 // @ts-ignore
   tbVersion: TB_VERSION,

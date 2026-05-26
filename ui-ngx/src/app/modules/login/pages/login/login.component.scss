@@ -20,13 +20,44 @@
   display: flex;
   flex: 1 1 0;
   .tb-login-content {
-    margin-top: 36px;
-    margin-bottom: 76px;
+    margin-top: 5px;
+    margin-bottom: 5px;
     background-color: #eee;
+    color: #0f172a;
     --mat-card-elevated-container-elevation: none;
+    --mdc-filled-text-field-label-text-color: #000;
+    --mdc-filled-text-field-focus-label-text-color: #000;
+    --mdc-outlined-text-field-label-text-color: #000;
+    --mdc-outlined-text-field-focus-label-text-color: #000;
+    --mdc-outlined-text-field-hover-label-text-color: #000;
+    --mdc-outlined-text-field-input-text-color: #000;
+    --mdc-outlined-text-field-outline-color: rgba(0, 0, 0, 0.35);
+    --mdc-outlined-text-field-hover-outline-color: rgba(0, 0, 0, 0.55);
+    --mdc-outlined-text-field-focus-outline-color: #000;
+    --mat-form-field-outlined-input-text-color: #000;
+    --mat-form-field-outlined-label-text-color: #000;
+    --mat-form-field-outlined-hover-label-text-color: #000;
+    --mat-form-field-outlined-outline-color: rgba(0, 0, 0, 0.35);
+    --mat-form-field-outlined-hover-outline-color: rgba(0, 0, 0, 0.55);
+    --mat-form-field-outlined-focus-outline-color: #000;
+
+    mat-card {
+      background-color: rgba(255, 255, 255, 0.88);
+      color: #0f172a;
+      border: 1px solid rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(6px);
+    }
     .tb-login-form {
       @media #{$mat-gt-xs} {
         width: 480px !important;
+      }
+
+      mat-form-field {
+        width: 100%;
+      }
+
+      .mat-mdc-form-field-subscript-wrapper {
+        min-height: 20px;
       }
 
       .forgot-password {
