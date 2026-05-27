@@ -1102,3 +1102,88 @@ cd thingsboard
 git fetch --tags
 git switch --detach v4.3.1.2
 git describe --tags  
+
+Build lần đầu
+cd thingsboard
+mvn clean install -DskipTests -Pdeb
+
+
+# Di chuyển vào thư mục UI
+cd ui-ngx
+
+# Xóa thư mục node, node_modules và yarn đã bị lỗi (nếu có)
+rm -rf node node_modules yarn.lock
+
+# Quay lại thư mục gốc dự án
+cd ..
+mvn clean install -DskipTests -rf :ui-ngx
+
+
+Sửa UI & build lại nhanh
+cd thingsboard
+mvn install -DskipTests -Pdeb -pl ui-ngx,application --also-make
+cp application/target/thingsboard.deb ~/tb-build/thingsboard.deb
+
+Build & push image mới
+cd ~/tb-build
+docker build -f Dockerfile.custom \
+  -t chauctw/thingsboard-custom:latest \
+  -t chauctw/thingsboard-custom:v4.3.1-$(date +%Y%m%d) \
+  .
+docker push chauctw/thingsboard-custom:latest
+docker push chauctw/thingsboard-custom:v4.3.1-$(date +%Y%m%d)
+
+Cập nhật server production
+cd /opt/thingsboard
+docker compose pull thingsboard
+docker compose up -d thingsboard
+docker compose logs -f thingsboard
+
+Rollback nếu có sự cố
+docker compose stop thingsboard
+docker tag chauctw/thingsboard-custom:v4.3.1-20260525 \
+  chauctw/thingsboard-custom:latest
+docker compose up -d thingsboard
+
+Bước 1 — Xóa node_modules và cài lại sạch:
+cd ~/thingsboard/ui-ngx
+rm -rf node_modules
+npm install --legacy-peer-deps
+
+Bước 2 — Xóa bản svg.js trùng trong svg.filter.js:
+rm -rf ~/thingsboard/ui-ngx/node_modules/@svgdotjs/svg.filter.js/node_modules
+
+Bước 3 — Cài các @types bị thiếu cho Leaflet extensions:
+cd ~/thingsboard/ui-ngx
+npm install --save-dev \
+  @types/leaflet.markercluster \
+  leaflet-polylinedecorator \
+  --legacy-peer-deps
+
+Bước 4 — Fix tsconfig để bỏ qua type conflict của svg.js:
+cat tsconfig.json | grep -A5 compilerOptions
+python3 << 'PYEOF'
+import json
+path = 'tsconfig.json'
+with open(path) as f:
+    content = f.read()
+
+# Parse với comment stripping thô
+import re
+cleaned = re.sub(r'//.*?\n', '\n', content)
+cleaned = re.sub(r'/\*.*?\*/', '', cleaned, flags=re.DOTALL)
+data = json.loads(cleaned)
+
+co = data.setdefault('compilerOptions', {})
+# Bỏ qua duplicate declarations
+co['skipLibCheck'] = True
+
+with open(path, 'w') as f:
+    json.dump(data, f, indent=2, ensure_ascii=False)
+print('Done - skipLibCheck: true đã được thêm')
+PYEOF
+
+Bước 5 — Build lại:
+cd ~/thingsboard/ui-ngx
+yarn run build:prod
+
