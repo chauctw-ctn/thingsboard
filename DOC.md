@@ -1187,3 +1187,7 @@ Bước 5 — Build lại:
 cd ~/thingsboard/ui-ngx
 yarn run build:prod
 
+
+git config --global user.email "chauctw@gmail.com"
+git config --global user.name "chauctw"
+git commit -m "Refactor code structure for improved readability and maintainability"
