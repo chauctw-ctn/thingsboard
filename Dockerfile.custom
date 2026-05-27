@@ -1,0 +1,14 @@
+FROM ubuntu:22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y \
+    openjdk-17-jre-headless \
+    postgresql-client \
+    wget curl && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY application/target/thingsboard-*.deb /tmp/thingsboard.deb
+RUN dpkg -i /tmp/thingsboard.deb && rm /tmp/thingsboard.deb
+
+EXPOSE 8080 1883 8883 8083
+CMD ["/usr/share/thingsboard/bin/thingsboard.sh", "run"]
